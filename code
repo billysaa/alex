@@ -1,0 +1,40 @@
+import os
+import subprocess
+
+
+APPS = {
+    "chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    "google chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+
+    "vscode": r"%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe",
+    "visual studio code": r"%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe",
+
+    "notepad": "notepad.exe",
+    "σημειωματάριο": "notepad.exe",
+
+    "calculator": "calc.exe",
+    "αριθμομηχανή": "calc.exe",
+
+    "explorer": "explorer.exe",
+    "αρχεία": "explorer.exe",
+
+    "task manager": "taskmgr.exe",
+    "διαχείριση εργασιών": "taskmgr.exe",
+}
+
+
+def open_app(name):
+
+    name = name.lower().strip()
+
+    if name not in APPS:
+        return False
+
+    path = os.path.expandvars(APPS[name])
+
+    try:
+        subprocess.Popen(path)
+        return True
+    except Exception as error:
+        print("App error:", error)
+        return False
