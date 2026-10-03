@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Alex AI</title>
+  <title>Zagkas AI</title>
   <style>
     :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
     *{box-sizing:border-box}
@@ -31,17 +31,17 @@
   <main class="app">
     <header>
       <div>
-        <h1>🤖 Alex AI</h1>
+        <h1>🤖 Zagkas AI</h1>
         <div class="sub">General-purpose AI assistant · OpenAI Responses API</div>
       </div>
-      <button id="clear">Καθαρισμός</button>
+      <div style="display:flex;gap:8px"><button id="speak" type="button">🔊 Ακούω τον Ζάγκα</button><button id="clear">Καθαρισμός</button></div>
     </header>
     <div id="status">Έλεγχος σύνδεσης…</div>
     <section id="chat">
       <div class="empty" id="empty">Γράψε κάτι για να ξεκινήσεις.</div>
     </section>
     <form id="form">
-      <textarea id="input" placeholder="Ρώτα τον Alex οτιδήποτε…" autocomplete="off"></textarea>
+      <textarea id="input" placeholder="Ρώτα τον Ζάγκα οτιδήποτε…" autocomplete="off"></textarea>
       <button class="send" type="submit">Αποστολή</button>
     </form>
   </main>
@@ -51,6 +51,7 @@ const input=document.getElementById("input");
 const form=document.getElementById("form");
 const status=document.getElementById("status");
 const clear=document.getElementById("clear");
+const speak=document.getElementById("speak");
 let messages=JSON.parse(localStorage.getItem("alex_messages")||"[]");
 
 function render(){
@@ -68,6 +69,17 @@ function render(){
   chat.scrollTop=chat.scrollHeight;
 }
 function save(){localStorage.setItem("alex_messages",JSON.stringify(messages));}
+function speakText(text){
+  if(!("speechSynthesis" in window)){alert("Η φωνητική λειτουργία δεν υποστηρίζεται από τον browser.");return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="el-GR"; u.rate=0.98; u.pitch=1;
+  const voices=speechSynthesis.getVoices();
+  const greek=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith("el"));
+  if(greek)u.voice=greek;
+  speechSynthesis.speak(u);
+}
+
 async function health(){
   try{
     const r=await fetch("/api/health");
@@ -89,10 +101,12 @@ form.addEventListener("submit",async e=>{
     const d=await r.json();
     if(!r.ok)throw new Error(d.error||"Request failed");
     pending.content=d.output||"Δεν πήρα απάντηση.";
+    speakText(pending.content);
   }catch(err){pending.content="Σφάλμα: "+err.message;}
   save(); render();
 });
-clear.addEventListener("click",()=>{messages=[];save();render();});
+clear.addEventListener("click",()=>{messages=[];save();render();speechSynthesis?.cancel();});
+speak.addEventListener("click",()=>{const last=[...messages].reverse().find(m=>m.role==="assistant");if(last)speakText(last.content);});
 input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
 render(); health();
 </script>
