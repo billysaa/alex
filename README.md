@@ -1,4 +1,4 @@
-# Alex AI 🤖
+# ZAGKAS AI 🤖
 
 A full starter AI assistant for the web, powered by the OpenAI Responses API.
 
