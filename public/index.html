@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Alex AI</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+    *{box-sizing:border-box}
+    body{margin:0;background:#0b0d12;color:#f5f7fb;min-height:100vh}
+    .app{max-width:1100px;margin:auto;min-height:100vh;display:flex;flex-direction:column;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0 18px}
+    h1{margin:0;font-size:28px}
+    .sub{color:#8d96a8;font-size:13px;margin-top:4px}
+    button{border:1px solid #303746;background:#171b24;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
+    button:hover{background:#202634}
+    #status{font-size:12px;color:#8d96a8;margin-bottom:12px}
+    #chat{flex:1;display:flex;flex-direction:column;gap:14px;padding:8px 0 20px}
+    .msg{max-width:85%;padding:14px 16px;border-radius:16px;white-space:pre-wrap;line-height:1.5}
+    .user{align-self:flex-end;background:#2563eb}
+    .assistant{align-self:flex-start;background:#171b24;border:1px solid #252c3a}
+    .empty{margin:auto;text-align:center;color:#788196;padding:60px 20px}
+    form{display:flex;gap:10px;position:sticky;bottom:0;background:linear-gradient(transparent,#0b0d12 25%);padding-top:18px}
+    textarea{flex:1;resize:none;min-height:54px;max-height:180px;background:#11151d;color:#fff;border:1px solid #303746;border-radius:14px;padding:15px;font:inherit;outline:none}
+    textarea:focus{border-color:#4d73ff}
+    .send{background:#2563eb;border-color:#2563eb;min-width:90px}
+    @media(max-width:650px){.app{padding:12px}.msg{max-width:94%}form{flex-direction:column}.send{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>🤖 Alex AI</h1>
+        <div class="sub">General-purpose AI assistant · OpenAI Responses API</div>
+      </div>
+      <button id="clear">Καθαρισμός</button>
+    </header>
+    <div id="status">Έλεγχος σύνδεσης…</div>
+    <section id="chat">
+      <div class="empty" id="empty">Γράψε κάτι για να ξεκινήσεις.</div>
+    </section>
+    <form id="form">
+      <textarea id="input" placeholder="Ρώτα τον Alex οτιδήποτε…" autocomplete="off"></textarea>
+      <button class="send" type="submit">Αποστολή</button>
+    </form>
+  </main>
+<script>
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
+const form=document.getElementById("form");
+const status=document.getElementById("status");
+const clear=document.getElementById("clear");
+let messages=JSON.parse(localStorage.getItem("alex_messages")||"[]");
+
+function render(){
+  chat.innerHTML="";
+  if(!messages.length){
+    chat.innerHTML='<div class="empty">Γράψε κάτι για να ξεκινήσεις.</div>';
+    return;
+  }
+  for(const m of messages){
+    const el=document.createElement("div");
+    el.className="msg "+(m.role==="user"?"user":"assistant");
+    el.textContent=m.content;
+    chat.appendChild(el);
+  }
+  chat.scrollTop=chat.scrollHeight;
+}
+function save(){localStorage.setItem("alex_messages",JSON.stringify(messages));}
+async function health(){
+  try{
+    const r=await fetch("/api/health");
+    const d=await r.json();
+    status.textContent=d.configured ? "● Συνδεδεμένο · "+d.model : "● Λείπει το OPENAI_API_KEY";
+    status.style.color=d.configured?"#63d391":"#ffb454";
+  }catch{status.textContent="● Ο server δεν απαντά";}
+}
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const text=input.value.trim();
+  if(!text)return;
+  messages.push({role:"user",content:text});
+  input.value=""; save(); render();
+  const pending={role:"assistant",content:"Σκέφτομαι…"};
+  messages.push(pending); render();
+  try{
+    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(0,-1)})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||"Request failed");
+    pending.content=d.output||"Δεν πήρα απάντηση.";
+  }catch(err){pending.content="Σφάλμα: "+err.message;}
+  save(); render();
+});
+clear.addEventListener("click",()=>{messages=[];save();render();});
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
+render(); health();
+</script>
+</body>
+</html>
