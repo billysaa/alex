@@ -2,7 +2,11 @@
 <html lang="el">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="description" content="Zagkas AI — προσωπικός AI βοηθός στα ελληνικά και στα αγγλικά.">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <title>Zagkas AI</title>
   <style>
     :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
@@ -34,7 +38,7 @@
         <h1>🤖 Zagkas AI</h1>
         <div class="sub">General-purpose AI assistant · OpenAI Responses API</div>
       </div>
-      <div style="display:flex;gap:8px"><button id="speak" type="button">🔊 Ακούω τον Ζάγκα</button><button id="clear">Καθαρισμός</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="install" type="button" hidden>📲 Εγκατάσταση</button><button id="speak" type="button">🔊 Ακούω τον Ζάγκα</button><button id="clear">Καθαρισμός</button></div>
     </header>
     <div id="status">Έλεγχος σύνδεσης…</div>
     <section id="chat">
@@ -52,6 +56,12 @@ const form=document.getElementById("form");
 const status=document.getElementById("status");
 const clear=document.getElementById("clear");
 const speak=document.getElementById("speak");
+const installButton=document.getElementById("install");
+let installPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;installButton.hidden=false;});
+installButton.addEventListener("click",async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installButton.hidden=true;});
+window.addEventListener("appinstalled",()=>{installButton.hidden=true;status.textContent="Η εφαρμογή εγκαταστάθηκε!";});
+if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("/sw.js").catch(()=>{});
 let messages=JSON.parse(localStorage.getItem("alex_messages")||"[]");
 
 function render(){
