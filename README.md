@@ -1,36 +1,43 @@
-# ZAGKAS AI 🤖
+# Zagkas AI 🤖
 
-A full starter AI assistant for the web, powered by the OpenAI Responses API.
+A responsive, installable web app for Zagkas AI, powered by the OpenAI Responses API.
 
-## What it includes
+## Features
 
-- Modern responsive chat UI
-- Greek + English conversations
-- Conversation history saved locally in the browser
-- Server-side OpenAI API key
-- Current-information web search through the Responses API
-- Health/configuration endpoint
-- Node.js + Express backend
-- Easy extension point for more tools later
+- Responsive Greek/English chat interface
+- Greek text-to-speech using the browser's available voices
+- Local browser chat history
+- Web search through the OpenAI Responses API
+- Progressive Web App (PWA) manifest and service worker
+- Install button in supported browsers
+- API key stays on the server (never put it in frontend files)
 
-## Setup
+## Deploy as an app (recommended: Render)
+
+GitHub stores the code; it does not run the Node.js server by itself. This repository includes `render.yaml` to make deployment easier.
+
+1. Push/keep these files on the `13` branch.
+2. Sign in to Render and create a **New + → Blueprint** from this GitHub repository.
+3. Render will read `render.yaml` and create the web service.
+4. In the service's Environment settings, set `OPENAI_API_KEY` to your secret API key. Do not put the key in GitHub.
+5. Confirm `OPENAI_MODEL` is set to a model available to your API project, then deploy.
+6. Open the public HTTPS URL Render gives you.
+7. In Chrome or Edge, use the browser's **Install app** option or the **📲 Εγκατάσταση** button when it appears.
+
+**Important:** OpenAI API usage may require billing/credits. ChatGPT subscription does not automatically include API usage. Never commit `.env` or any API key.
+
+## Run locally
 
 Requirements: Node.js 20+ and an OpenAI API key.
 
 1. Copy `.env.example` to `.env`.
-2. Put your API key in `OPENAI_API_KEY`.
-3. Install packages: `npm install`
-4. Start: `npm start`
+2. Set `OPENAI_API_KEY` in `.env`.
+3. Run `npm install`.
+4. Run `npm start`.
 5. Open `http://localhost:3000`.
-
-**Never commit `.env` or an API key to GitHub.**
 
 ## Architecture
 
-Browser → Express server → OpenAI Responses API → optional web search → answer.
+Browser/PWA → Express server → OpenAI Responses API → web search → answer.
 
-The project uses the Responses API for new integrations. The Assistants API was sunset on August 26, 2026.
-
-## Next extensions
-
-File search, image generation, GitHub actions, authentication, databases, voice and automation can be added without exposing secrets in the browser.
+The server serves the app from `public/`. The Progressive Web App install option requires a secure HTTPS deployment (or localhost for local testing).
