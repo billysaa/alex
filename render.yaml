@@ -9,7 +9,7 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
-      - key: OPENAIsk-proj-mf7wHRgy90ZjDtCM14ImHO5SihhoQo-oksKrLIT3VEPYWJ6jWeswx6c-PrX_5FuNIVYjEwfrk2T3BlbkFJCBX8t-st7Y1Xe7GOfZWDK4XwdvQGBqNqemNeJxSVImiNYkr4wwCzrlUiVxldc8IdIypzm1X9gA
-        sync: false
+      - key: OPENAI_API_KEY
+        value: sk-proj-mf7wHRgy90ZjDtCM14ImHO5SihhoQo-oksKrLIT3VEPYWJ6jWeswx6c-PrX_5FuNIVYjEwfrk2T3B1bkFJCBX8t-st7Y1Xe7G0fZWDK4XwdvQGBqNqemNeJxSVImiNYkr4wwCzrlUiVxldc8IdIypzm1X9gA
       - key: OPENAI_MODEL
-        value: gpt-6-luna
+        value: gpt-4o
