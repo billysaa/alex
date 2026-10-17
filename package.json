@@ -1,8 +1,8 @@
 {
-  "name": "alex-ai",
+  "name": "zagkas-ai",
   "version": "1.0.0",
   "private": true,
-  "description": "Alex - general purpose AI assistant powered by the OpenAI Responses API.",
+  "description": "Zagkas AI — installable general-purpose AI assistant powered by OpenAI.",
   "type": "module",
   "scripts": {
     "start": "node server.js",
