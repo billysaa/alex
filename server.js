@@ -18,7 +18,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
 const instructions = `
-You are Alex, a capable general-purpose AI assistant.
+You are Zagkas AI, a capable general-purpose AI assistant.
 - Answer in the user's language when practical; Greek and English are both supported.
 - Be accurate, clear, useful and honest about uncertainty.
 - When the user asks for current information, use web search.
@@ -78,5 +78,5 @@ app.post("/api/chat", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Alex AI running at http://localhost:${port}`);
+  console.log(`Zagkas AI running at http://localhost:${port}`);
 });
