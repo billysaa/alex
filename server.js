@@ -4,25 +4,27 @@ import OpenAI from "openai";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const model = process.env.OPENAI_MODEL || "gpt-4o";
+const model = process.env.LLAMA_MODEL || "llama-3.3-70b-versatile";
 
-if (!process.env.OPENAI_API_KEY) {
-  console.warn("OPENAI_API_KEY is not set. Add it to .env before using /api/chat.");
+if (!process.env.GROQ_API_KEY) {
+  console.warn("GROQ_API_KEY is not set. Add it to .env before using /api/chat.");
 }
 
-const client = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const client = process.env.GROQ_API_KEY
+  ? new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: "https://api.groq.com/openai/v1"
+    })
   : null;
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
 const instructions = `
-You are Zagkas AI, a capable general-purpose AI assistant.
-- Answer in the user's language when practical; Greek and English are both supported.
+You are Zagkas AI, powered by Llama.
+- Answer in the user's language when practical; Greek and English are supported.
 - Be accurate, clear, useful and honest about uncertainty.
-- When the user asks for current information, use web search.
-- You can help with coding, school, writing, research, planning, troubleshooting and everyday questions.
+- Help with coding, school, writing, research, planning, troubleshooting and everyday questions.
 - Never reveal API keys, secrets or server environment variables.
 - Do not claim to have performed an action outside this application unless a real tool performed it.
 - Keep answers reasonably concise unless the user asks for detail.
@@ -39,7 +41,8 @@ function cleanMessages(messages) {
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
-    configured: Boolean(process.env.OPENAI_API_KEY),
+    configured: Boolean(process.env.GROQ_API_KEY),
+    provider: "Groq",
     model
   });
 });
@@ -48,7 +51,7 @@ app.post("/api/chat", async (req, res) => {
   try {
     if (!client) {
       return res.status(503).json({
-        error: "OpenAI API key is not configured. Add OPENAI_API_KEY to the server environment."
+        error: "Το GROQ_API_KEY δεν έχει ρυθμιστεί. Βάλε το στο .env ή στα environment variables του server."
       });
     }
 
@@ -57,30 +60,32 @@ app.post("/api/chat", async (req, res) => {
       return res.status(400).json({ error: "No messages supplied." });
     }
 
-    const response = await client.responses.create({
+    const completion = await client.chat.completions.create({
       model,
-      instructions,
-      input: messages,
-      tools: [{ type: "web_search" }],
-      store: false
+      messages: [
+        { role: "system", content: instructions },
+        ...messages
+      ],
+      temperature: 0.7,
+      max_tokens: 2048
     });
 
     res.json({
-      output: response.output_text || "Δεν πήρα κείμενο από το μοντέλο.",
-      response_id: response.id
+      output: completion.choices?.[0]?.message?.content || "Δεν πήρα κείμενο από το μοντέλο.",
+      response_id: completion.id
     });
   } catch (error) {
     console.error("Chat request failed:", error?.status || "", error?.message || error);
     const status = error?.status === 401 ? 401 : error?.status === 429 ? 429 : 500;
     const message = status === 401
-      ? "Το API key δεν είναι έγκυρο. Έλεγξε το secret OPENAI_API_KEY στον server."
+      ? "Το Groq API key δεν είναι έγκυρο. Έλεγξε το GROQ_API_KEY."
       : status === 429
-        ? "Το API όριο ή το διαθέσιμο υπόλοιπο εξαντλήθηκε. Έλεγξε το billing και τα limits του API project."
-        : "Παρουσιάστηκε σφάλμα στον server. Έλεγξε τα logs της υπηρεσίας.";
+        ? "Έφτασες το όριο χρήσης του Groq. Περίμενε ή έλεγξε τα limits του λογαριασμού σου."
+        : "Παρουσιάστηκε σφάλμα στον server. Έλεγξε τα logs και ότι το μοντέλο είναι διαθέσιμο.";
     res.status(status).json({ error: message });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Zagkas AI running at http://localhost:${port}`);
+  console.log(`Zagkas AI (Llama) running at http://localhost:${port}`);
 });
