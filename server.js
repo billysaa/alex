@@ -4,7 +4,7 @@ import OpenAI from "openai";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const model = process.env.OPENAI_MODEL || "gpt-6-luna";
+const model = process.env.OPENAI_MODEL || "gpt-4o";
 
 if (!process.env.OPENAI_API_KEY) {
   console.warn("OPENAI_API_KEY is not set. Add it to .env before using /api/chat.");
@@ -48,7 +48,7 @@ app.post("/api/chat", async (req, res) => {
   try {
     if (!client) {
       return res.status(503).json({
-        error: "OpenAI API key is not configured. Create a .env file from .env.example."
+        error: "OpenAI API key is not configured. Add OPENAI_API_KEY to the server environment."
       });
     }
 
@@ -70,10 +70,14 @@ app.post("/api/chat", async (req, res) => {
       response_id: response.id
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: error?.message || "Unexpected server error."
-    });
+    console.error("Chat request failed:", error?.status || "", error?.message || error);
+    const status = error?.status === 401 ? 401 : error?.status === 429 ? 429 : 500;
+    const message = status === 401
+      ? "Το API key δεν είναι έγκυρο. Έλεγξε το secret OPENAI_API_KEY στον server."
+      : status === 429
+        ? "Το API όριο ή το διαθέσιμο υπόλοιπο εξαντλήθηκε. Έλεγξε το billing και τα limits του API project."
+        : "Παρουσιάστηκε σφάλμα στον server. Έλεγξε τα logs της υπηρεσίας.";
+    res.status(status).json({ error: message });
   }
 });
 
