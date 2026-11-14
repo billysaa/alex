@@ -15,7 +15,7 @@ const client = process.env.GROQ_API_KEY ? new OpenAI({
   maxRetries: 1
 }) : null;
 
-app.use(express.json({ limit: "45mb" }));
+app.use(express.json({ limit: "100mb" }));
 app.use(express.static("public"));
 
 const instructions = `You are Zagkas AI, a polished, helpful Greek/English assistant.
