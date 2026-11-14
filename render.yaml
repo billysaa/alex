@@ -11,5 +11,7 @@ services:
         value: 22
       - key: GROQ_API_KEY
         sync: false
-      - key: LLAMA_MODEL
-        value: llama-3.3-70b-versatile
+      - key: FAST_MODEL
+        value: openai/gpt-oss-20b
+      - key: DEEP_MODEL
+        value: openai/gpt-oss-120b
