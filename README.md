@@ -1,6 +1,6 @@
 # ZAGKAS AI — Intelligence Studio
 
-A responsive Greek/English AI assistant with fast cloud chat, image understanding, voice input and optional spoken replies.
+A responsive Greek/English AI assistant with fast cloud chat, image understanding, voice input and an optional Windows desktop shell with wake-word listening and safe app launching.
 
 ## Features
 
@@ -20,7 +20,7 @@ A responsive Greek/English AI assistant with fast cloud chat, image understandin
 - A Groq API key (free tier subject to changing rate limits)
 - Internet connection
 
-## Run locally
+## Windows desktop assistant\n\n1. Install Node.js 20 or later.\n2. Copy `.env.example` to `.env` and add your `GROQ_API_KEY`.\n3. Double-click `START_ZAGKAS_DESKTOP.bat` (or run `npm install` then `npm run desktop`).\n4. In Settings, enable **Wake word «Ζάγκα»** and allow microphone access.\n5. Say **«Ζάγκα»**, wait for the listening confirmation, then say a command. Supported app commands include opening Notepad, Calculator, File Explorer, Task Manager, VS Code, Chrome and Spotify.\n\nThe wake-word listener uses the Chromium Web Speech Recognition service in Greek (`el-GR`); it is not fully offline and requires a compatible Electron/Windows environment and internet access. Keep the desktop app open for wake-word listening. App launching is restricted to a fixed allowlist; arbitrary shell commands are not executed.\n\n## Run locally
 
 1. Copy `.env.example` to `.env`.
 2. Add your Groq API key to `GROQ_API_KEY`.
