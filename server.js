@@ -5,9 +5,9 @@ import { spawn } from "node:child_process";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const FAST_MODEL = process.env.FAST_MODEL || "openai/gpt-oss-20b";
-const DEEP_MODEL = process.env.DEEP_MODEL || "openai/gpt-oss-120b";
-const VISION_MODEL = process.env.VISION_MODEL || "qwen/qwen3.8-27b";
+const FAST_MODEL = process.env.FAST_MODEL || "grok-4.7";
+const DEEP_MODEL = process.env.DEEP_MODEL || "grok-4.7";
+const VISION_MODEL = process.env.VISION_MODEL || "grok-4.7";
 
 const client = process.env.GROQ_API_KEY ? new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
@@ -94,13 +94,13 @@ app.post("/api/desktop/command", (req, res) => {
 });
 
 app.get("/api/health",(_req,res)=>res.json({
-  ok:true,configured:Boolean(client),provider:"Groq",
+  ok:true,configured:Boolean(client),provider:"xAI / Grok",
   model:FAST_MODEL,deepModel:DEEP_MODEL,visionModel:VISION_MODEL
 }));
 
 app.post("/api/chat",async(req,res)=>{
   try {
-    if(!client) return res.status(503).json({error:"Λείπει το GROQ_API_KEY από το αρχείο .env."});
+    if(!client) return res.status(503).json({error:"Λείπει το XAI_API_KEY από το αρχείο .env."});
     const messages=cleanMessages(req.body?.messages);
     if(!messages.length) return res.status(400).json({error:"Δεν δόθηκε μήνυμα."});
     const userText=lastUserText(messages);
@@ -153,7 +153,7 @@ app.post("/api/chat",async(req,res)=>{
   } catch(error) {
     console.error("Chat request failed:",error?.status||"",error?.message||error);
     const status=error?.status===401?401:error?.status===429?429:error?.status===413?413:500;
-    const message=status===401?"Το Groq API key δεν είναι έγκυρο.":status===429?"Έφτασες προσωρινά το δωρεάν όριο χρήσης. Δοκίμασε ξανά αργότερα.":status===413?"Το αίτημα είναι πολύ μεγάλο. Μείωσε το μέγεθος των εικόνων.":"Παρουσιάστηκε σφάλμα στην ανάλυση. Έλεγξε αν το μοντέλο είναι διαθέσιμο στο Groq.";
+    const message=status===401?"Το xAI API key δεν είναι έγκυρο.":status===429?"Έφτασες το διαθέσιμο όριο ή το υπόλοιπο API. Έλεγξε το xAI Console.":status===413?"Το αίτημα είναι πολύ μεγάλο. Μείωσε το μέγεθος των εικόνων.":"Παρουσιάστηκε σφάλμα στην ανάλυση. Έλεγξε αν το μοντέλο grok-4.7 είναι διαθέσιμο στο xAI API και αν υπάρχει διαθέσιμο υπόλοιπο.";
     res.status(status).json({error:message});
   }
 });
