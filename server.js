@@ -9,9 +9,9 @@ const FAST_MODEL = process.env.FAST_MODEL || "grok-4.7";
 const DEEP_MODEL = process.env.DEEP_MODEL || "grok-4.7";
 const VISION_MODEL = process.env.VISION_MODEL || "grok-4.7";
 
-const client = process.env.GROQ_API_KEY ? new OpenAI({
+const client = process.env.XAI_API_KEY ? new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
+  baseURL: "https://api.x.ai/v1",
   timeout: 60000,
   maxRetries: 1
 }) : null;
