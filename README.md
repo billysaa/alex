@@ -5,8 +5,8 @@ A responsive Greek/English AI assistant with fast cloud chat, image understandin
 ## Features
 
 - Professional responsive dark interface
-- Fast-first Groq cloud chat (no local Ollama model required)
-- Image uploads: up to 12 images per message, processed in batches of up to 3 by Groq's vision model
+- Fast-first xAI / Grok cloud chat (no local Ollama model required)
+- Image uploads: up to 12 images per message, processed in batches of up to 3 by xAI / Grok's vision model
 - Ask the AI to describe, compare, inspect or otherwise analyze uploaded images
 - Microphone button for speech-to-text where supported by the browser
 - Optional read-aloud setting: replies are spoken ONLY when the user enables it
@@ -17,13 +17,13 @@ A responsive Greek/English AI assistant with fast cloud chat, image understandin
 ## Requirements
 
 - Node.js 20+
-- A Groq API key (free tier subject to changing rate limits)
+- A xAI / Grok API key (free tier subject to changing rate limits)
 - Internet connection
 
-## Windows desktop assistant\n\n1. Install Node.js 20 or later.\n2. Copy `.env.example` to `.env` and add your `GROQ_API_KEY`.\n3. Double-click `START_ZAGKAS_DESKTOP.bat` (or run `npm install` then `npm run desktop`).\n4. In Settings, enable **Wake word «Ζάγκα»** and allow microphone access.\n5. Say **«Ζάγκα»**, wait for the listening confirmation, then say a command. Supported app commands include opening Notepad, Calculator, File Explorer, Task Manager, VS Code, Chrome and Spotify.\n\nThe wake-word listener uses the Chromium Web Speech Recognition service in Greek (`el-GR`); it is not fully offline and requires a compatible Electron/Windows environment and internet access. Keep the desktop app open for wake-word listening. App launching is restricted to a fixed allowlist; arbitrary shell commands are not executed.\n\n## Run locally
+## Windows desktop assistant\n\n1. Install Node.js 20 or later.\n2. Copy `.env.example` to `.env` and add your `XAI_API_KEY`.\n3. Double-click `START_ZAGKAS_DESKTOP.bat` (or run `npm install` then `npm run desktop`).\n4. In Settings, enable **Wake word «Ζάγκα»** and allow microphone access.\n5. Say **«Ζάγκα»**, wait for the listening confirmation, then say a command. Supported app commands include opening Notepad, Calculator, File Explorer, Task Manager, VS Code, Chrome and Spotify.\n\nThe wake-word listener uses the Chromium Web Speech Recognition service in Greek (`el-GR`); it is not fully offline and requires a compatible Electron/Windows environment and internet access. Keep the desktop app open for wake-word listening. App launching is restricted to a fixed allowlist; arbitrary shell commands are not executed.\n\n## Run locally
 
 1. Copy `.env.example` to `.env`.
-2. Add your Groq API key to `GROQ_API_KEY`.
+2. Add your xAI / Grok API key to `XAI_API_KEY`.
 3. Run `npm install`.
 4. Run `npm start`.
 5. Open `http://localhost:3000`.
@@ -32,11 +32,11 @@ Windows users can run `START_ZAGKAS_AI.bat`.
 
 ## Models
 
-- Text fast: `openai/gpt-oss-20b`
-- Text deep: `openai/gpt-oss-120b` for longer/complex questions
-- Vision: `qwen/qwen3.8-27b`
+- Text fast: `grok-4.7`
+- Text deep: `grok-4.7` for longer/complex questions
+- Vision: `grok-4.7`
 
-Model availability and free-tier quotas can change. Check Groq's current model and rate-limit documentation.
+Grok API usage is billed by tokens. Check current model availability and pricing in the official xAI documentation.
 
 ## Important voice / desktop limitations
 
@@ -46,4 +46,4 @@ A normal browser page also cannot freely launch arbitrary installed Windows appl
 
 ## Security
 
-Never commit `.env` or API keys to GitHub. Uploaded images are sent to Groq for analysis when you submit the message. Avoid uploading sensitive/private images.
+Never commit `.env` or API keys to GitHub. Uploaded images are sent to xAI / Grok for analysis when you submit the message. Avoid uploading sensitive/private images.
