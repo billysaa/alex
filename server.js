@@ -4,16 +4,17 @@ import OpenAI from "openai";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const model = process.env.LLAMA_MODEL || "llama-3.3-70b-versatile";
 
-if (!process.env.GROQ_API_KEY) {
-  console.warn("GROQ_API_KEY is not set. Add it to .env before using /api/chat.");
-}
+// Fast default model; use the larger model only for clearly complex requests.
+const FAST_MODEL = process.env.FAST_MODEL || "openai/gpt-oss-20b";
+const DEEP_MODEL = process.env.DEEP_MODEL || "openai/gpt-oss-120b";
 
 const client = process.env.GROQ_API_KEY
   ? new OpenAI({
       apiKey: process.env.GROQ_API_KEY,
-      baseURL: "https://api.groq.com/openai/v1"
+      baseURL: "https://api.groq.com/openai/v1",
+      timeout: 30000,
+      maxRetries: 1
     })
   : null;
 
@@ -21,29 +22,46 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
 const instructions = `
-You are Zagkas AI, powered by Llama.
-- Answer in the user's language when practical; Greek and English are supported.
-- Be accurate, clear, useful and honest about uncertainty.
-- Help with coding, school, writing, research, planning, troubleshooting and everyday questions.
+You are Zagkas AI, a fast and helpful Greek/English assistant.
+- Answer in the user's language.
+- Give one clear, direct final answer, not multiple alternative answers.
+- Be accurate, useful and honest about uncertainty.
+- Help with coding, school, writing, research, planning and troubleshooting.
 - Never reveal API keys, secrets or server environment variables.
-- Do not claim to have performed an action outside this application unless a real tool performed it.
-- Keep answers reasonably concise unless the user asks for detail.
+- Do not claim to have performed an action unless a real tool performed it.
+- Be concise by default; expand only when useful or requested.
 `;
 
 function cleanMessages(messages) {
   if (!Array.isArray(messages)) return [];
   return messages
     .filter(m => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-    .slice(-30)
-    .map(m => ({ role: m.role, content: m.content.slice(0, 12000) }));
+    .slice(-16)
+    .map(m => ({ role: m.role, content: m.content.slice(0, 8000) }));
+}
+
+function latestUserText(messages) {
+  return [...messages].reverse().find(m => m.role === "user")?.content || "";
+}
+
+function needsDeeperModel(text) {
+  const t = text.toLowerCase();
+  const complexSignals = [
+    "αναλυτικά", "σε βάθος", "σύγκρινε", "σύγκριση", "σχεδίασε", "αρχιτεκτονική",
+    "debug", "διόρθωσε όλο", "ολόκληρο project", "νομική ανάλυση", "μαθηματική απόδειξη",
+    "step by step", "in detail", "compare", "architecture", "debug", "prove", "comprehensive"
+  ];
+  return text.length > 1400 || complexSignals.some(s => t.includes(s));
 }
 
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
-    configured: Boolean(process.env.GROQ_API_KEY),
+    configured: Boolean(client),
     provider: "Groq",
-    model
+    model: FAST_MODEL,
+    deepModel: DEEP_MODEL,
+    routing: "fast-first"
   });
 });
 
@@ -51,7 +69,7 @@ app.post("/api/chat", async (req, res) => {
   try {
     if (!client) {
       return res.status(503).json({
-        error: "Το GROQ_API_KEY δεν έχει ρυθμιστεί. Βάλε το στο .env ή στα environment variables του server."
+        error: "Δεν έχει ρυθμιστεί το GROQ_API_KEY. Βάλε δωρεάν Groq API key στο αρχείο .env."
       });
     }
 
@@ -60,19 +78,21 @@ app.post("/api/chat", async (req, res) => {
       return res.status(400).json({ error: "No messages supplied." });
     }
 
+    const useDeep = needsDeeperModel(latestUserText(messages));
+    const selectedModel = useDeep ? DEEP_MODEL : FAST_MODEL;
+
     const completion = await client.chat.completions.create({
-      model,
-      messages: [
-        { role: "system", content: instructions },
-        ...messages
-      ],
-      temperature: 0.7,
-      max_tokens: 2048
+      model: selectedModel,
+      messages: [{ role: "system", content: instructions }, ...messages],
+      temperature: 0.5,
+      max_tokens: useDeep ? 1400 : 850
     });
 
     res.json({
       output: completion.choices?.[0]?.message?.content || "Δεν πήρα κείμενο από το μοντέλο.",
-      response_id: completion.id
+      response_id: completion.id,
+      model: selectedModel,
+      mode: useDeep ? "deep" : "fast"
     });
   } catch (error) {
     console.error("Chat request failed:", error?.status || "", error?.message || error);
@@ -80,12 +100,13 @@ app.post("/api/chat", async (req, res) => {
     const message = status === 401
       ? "Το Groq API key δεν είναι έγκυρο. Έλεγξε το GROQ_API_KEY."
       : status === 429
-        ? "Έφτασες το όριο χρήσης του Groq. Περίμενε ή έλεγξε τα limits του λογαριασμού σου."
-        : "Παρουσιάστηκε σφάλμα στον server. Έλεγξε τα logs και ότι το μοντέλο είναι διαθέσιμο.";
+        ? "Έφτασες το δωρεάν όριο του Groq. Περίμενε να ανανεωθεί ή δοκίμασε αργότερα."
+        : "Παρουσιάστηκε σφάλμα σύνδεσης με το AI. Έλεγξε το server log και αν το μοντέλο είναι διαθέσιμο.";
     res.status(status).json({ error: message });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Zagkas AI (Llama) running at http://localhost:${port}`);
+  console.log(`Zagkas AI ready at http://localhost:${port}`);
+  console.log(`Fast model: ${FAST_MODEL} | Deep model: ${DEEP_MODEL}`);
 });
