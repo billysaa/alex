@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "desktop": "electron ."
   },
   "dependencies": {
     "dotenv": "^17.2.2",
@@ -15,5 +16,9 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "main": "desktop-main.cjs",
+  "devDependencies": {
+    "electron": "^38.2.0"
   }
 }
