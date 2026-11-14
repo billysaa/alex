@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import OpenAI from "openai";
+import { spawn } from "node:child_process";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -52,6 +53,45 @@ function needsDeep(text) {
   const t=text.toLowerCase();
   return text.length>1400 || ["αναλυτικά","σε βάθος","σύγκρινε","σύγκριση","αρχιτεκτονική","debug","step by step","in detail","compare","architecture","comprehensive"].some(s=>t.includes(s));
 }
+
+
+const appCommands = {
+  "notepad": { target: "notepad.exe", label: "Σημειωματάριο" },
+  "calculator": { target: "calc.exe", label: "Αριθμομηχανή" },
+  "explorer": { target: "explorer.exe", label: "Εξερεύνηση αρχείων" },
+  "task manager": { target: "taskmgr.exe", label: "Διαχείριση εργασιών" },
+  "vscode": { target: "code", label: "Visual Studio Code" },
+  "chrome": { target: "chrome", label: "Google Chrome" },
+  "spotify": { target: "spotify:", label: "Spotify" }
+};
+function normalizeCommand(value) {
+  return String(value || "").toLocaleLowerCase("el-GR").normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "").replace(/[.,!?]/g, " ").replace(/\\s+/g, " ").trim();
+}
+app.post("/api/desktop/command", (req, res) => {
+  const raw = String(req.body?.command || "").slice(0, 300);
+  const command = normalizeCommand(raw);
+  const openMatch = command.match(/^(?:ανοιξε|ανοιξε μου|ξεκινα|εκκινησε)\\s+(.+)$/);
+  if (!openMatch) return res.json({ handled: false });
+  const requested = openMatch[1].replace(/^(τον|την|το)\\s+/, "").trim();
+  const aliases = {
+    "σημειωματαριο": "notepad", "notepad": "notepad",
+    "αριθμομηχανη": "calculator", "calculator": "calculator", "κομπιουτερ": "calculator",
+    "εξερευνητη": "explorer", "εξερευνηση αρχειων": "explorer", "φακελους": "explorer", "explorer": "explorer",
+    "διαχειριση εργασιων": "task manager", "task manager": "task manager",
+    "visual studio code": "vscode", "vs code": "vscode", "vscode": "vscode",
+    "chrome": "chrome", "γκουγκλ χρομ": "chrome",
+    "spotify": "spotify", "σποτιφαϊ": "spotify", "σποτιφαι": "spotify"
+  };
+  const key = aliases[requested];
+  const item = key && appCommands[key];
+  if (!item) return res.json({ handled: false });
+  const child = spawn("cmd.exe", ["/c", "start", "", item.target], {
+    detached: true, stdio: "ignore", windowsHide: true
+  });
+  child.unref();
+  return res.json({ handled: true, message: "Ανοίγω: " + item.label });
+});
 
 app.get("/api/health",(_req,res)=>res.json({
   ok:true,configured:Boolean(client),provider:"Groq",
