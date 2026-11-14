@@ -36,7 +36,7 @@
     <header>
       <div>
         <h1>🤖 Zagkas AI</h1>
-        <div class="sub">General-purpose AI assistant · OpenAI Responses API</div>
+        <div class="sub">Fast cloud AI · έξυπνη επιλογή μοντέλου</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="install" type="button" hidden>📲 Εγκατάσταση</button><button id="speak" type="button">🔊 Ακούω τον Ζάγκα</button><button id="clear">Καθαρισμός</button></div>
     </header>
@@ -94,7 +94,7 @@ async function health(){
   try{
     const r=await fetch("/api/health");
     const d=await r.json();
-    status.textContent=d.configured ? "● Συνδεδεμένο · "+d.model : "● Λείπει το OPENAI_API_KEY";
+    status.textContent=d.configured ? "● Συνδεδεμένο · Fast mode: "+d.model : "● Λείπει το GROQ_API_KEY";
     status.style.color=d.configured?"#63d391":"#ffb454";
   }catch{status.textContent="● Ο server δεν απαντά";}
 }
