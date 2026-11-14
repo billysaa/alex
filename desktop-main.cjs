@@ -14,7 +14,7 @@ async function waitForServer(url, attempts = 40) {
 }
 
 async function createWindow() {
-  server = spawn(process.execPath, ["server.js"], {
+  server = spawn("node", ["server.js"], {
     cwd: app.getAppPath(),
     env: { ...process.env, PORT: process.env.PORT || "3000" },
     stdio: "inherit",
