@@ -1,124 +1,53 @@
 <!doctype html>
 <html lang="el">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b0d12">
-  <meta name="description" content="Zagkas AI — προσωπικός AI βοηθός στα ελληνικά και στα αγγλικά.">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/icon.svg" type="image/svg+xml">
-  <title>Zagkas AI</title>
-  <style>
-    :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-    *{box-sizing:border-box}
-    body{margin:0;background:#0b0d12;color:#f5f7fb;min-height:100vh}
-    .app{max-width:1100px;margin:auto;min-height:100vh;display:flex;flex-direction:column;padding:20px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0 18px}
-    h1{margin:0;font-size:28px}
-    .sub{color:#8d96a8;font-size:13px;margin-top:4px}
-    button{border:1px solid #303746;background:#171b24;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
-    button:hover{background:#202634}
-    #status{font-size:12px;color:#8d96a8;margin-bottom:12px}
-    #chat{flex:1;display:flex;flex-direction:column;gap:14px;padding:8px 0 20px}
-    .msg{max-width:85%;padding:14px 16px;border-radius:16px;white-space:pre-wrap;line-height:1.5}
-    .user{align-self:flex-end;background:#2563eb}
-    .assistant{align-self:flex-start;background:#171b24;border:1px solid #252c3a}
-    .empty{margin:auto;text-align:center;color:#788196;padding:60px 20px}
-    form{display:flex;gap:10px;position:sticky;bottom:0;background:linear-gradient(transparent,#0b0d12 25%);padding-top:18px}
-    textarea{flex:1;resize:none;min-height:54px;max-height:180px;background:#11151d;color:#fff;border:1px solid #303746;border-radius:14px;padding:15px;font:inherit;outline:none}
-    textarea:focus{border-color:#4d73ff}
-    .send{background:#2563eb;border-color:#2563eb;min-width:90px}
-    @media(max-width:650px){.app{padding:12px}.msg{max-width:94%}form{flex-direction:column}.send{width:100%}}
-  </style>
-</head>
-<body>
-  <main class="app">
-    <header>
-      <div>
-        <h1>🤖 Zagkas AI</h1>
-        <div class="sub">Fast cloud AI · έξυπνη επιλογή μοντέλου</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="install" type="button" hidden>📲 Εγκατάσταση</button><button id="speak" type="button">🔊 Ακούω τον Ζάγκα</button><button id="clear">Καθαρισμός</button></div>
-    </header>
-    <div id="status">Έλεγχος σύνδεσης…</div>
-    <section id="chat">
-      <div class="empty" id="empty">Γράψε κάτι για να ξεκινήσεις.</div>
-    </section>
-    <form id="form">
-      <textarea id="input" placeholder="Ρώτα τον Ζάγκα οτιδήποτε…" autocomplete="off"></textarea>
-      <button class="send" type="submit">Αποστολή</button>
-    </form>
-  </main>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d18"><meta name="description" content="Zagkas AI — personal multimodal assistant">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>ZAGKAS AI</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--bg:#080b13;--panel:#101624;--panel2:#151e30;--line:#26334a;--muted:#91a0b8;--text:#f3f6fc;--blue:#6687ff;--cyan:#58d6d0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1b2a50 0,transparent 55%),var(--bg);color:var(--text);min-height:100vh}
+button,textarea{font:inherit}button{cursor:pointer;color:inherit}.shell{max-width:1450px;margin:auto;min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;padding:18px}
+.sidebar,.main{border:1px solid var(--line);background:rgba(14,20,33,.88);backdrop-filter:blur(18px);border-radius:22px}.sidebar{padding:20px;display:flex;flex-direction:column;gap:22px}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:15px;background:linear-gradient(135deg,#6b83ff,#53d9d0);display:grid;place-items:center;color:#07111d;font-weight:900;font-size:20px;box-shadow:0 8px 30px #5579ff40}.brand h1{font-size:18px;letter-spacing:2px;margin:0}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.5px;margin-top:3px}
+.primary,.ghost,.iconbtn{border:1px solid var(--line);border-radius:12px;background:#172238;padding:11px 13px}.primary{background:linear-gradient(120deg,#5878ff,#4c9cce);border:0;font-weight:700}.ghost:hover,.iconbtn:hover{border-color:#718aff;background:#1b2942}.navlabel{font-size:10px;letter-spacing:1.8px;color:#71819b;font-weight:800}.side-note{margin-top:auto;padding:14px;border:1px solid var(--line);border-radius:15px;color:var(--muted);font-size:12px;line-height:1.6}.online{display:flex;align-items:center;gap:8px;color:#8fe3bc;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#5ee0a3;box-shadow:0 0 12px #5ee0a3}
+.main{min-height:calc(100vh - 36px);display:flex;flex-direction:column;overflow:hidden}.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);gap:12px}.top-title{font-weight:700}.top-sub{font-size:12px;color:var(--muted);margin-top:4px}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.content{width:min(920px,100%);margin:0 auto;padding:24px;flex:1;display:flex;flex-direction:column}.welcome{margin:auto;text-align:center;max-width:650px;padding:45px 12px}.orb{width:76px;height:76px;margin:0 auto 22px;border-radius:26px;background:linear-gradient(145deg,#607cff,#52d8d0);display:grid;place-items:center;font-size:34px;box-shadow:0 12px 55px #527dff40}.welcome h2{font-size:clamp(27px,4vw,40px);margin:0 0 12px;letter-spacing:-1px}.welcome p{color:var(--muted);line-height:1.7;margin:0}.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:25px}.chip{border:1px solid var(--line);background:#121b2b;padding:10px 13px;border-radius:99px;color:#c4cee0;font-size:12px}
+#chat{display:flex;flex-direction:column;gap:18px;padding-bottom:20px}.msg{max-width:88%;padding:15px 17px;border-radius:18px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.user{align-self:flex-end;background:linear-gradient(135deg,#3157bb,#28458e);border:1px solid #5477d6}.assistant{align-self:flex-start;background:#141d2d;border:1px solid #2b3a52}.msgmeta{font-size:10px;color:#9aabc5;margin-bottom:6px;letter-spacing:.7px;text-transform:uppercase}.msg img{max-width:min(100%,240px);max-height:180px;object-fit:cover;border-radius:10px;margin:5px 7px 5px 0}
+.composer-wrap{padding:0 24px 22px}.composer{max-width:920px;margin:auto;border:1px solid #34445e;background:#111a2a;border-radius:20px;padding:12px;box-shadow:0 15px 50px #0005}.previews{display:flex;gap:9px;flex-wrap:wrap;padding:2px 3px 10px}.preview{position:relative}.preview img{width:66px;height:66px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.remove{position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#e45c70;color:white;padding:0}.entry{display:flex;align-items:flex-end;gap:9px}.entry textarea{flex:1;min-width:0;resize:none;max-height:180px;min-height:50px;background:transparent;color:var(--text);border:0;outline:0;padding:13px;font-size:14px}.entry textarea::placeholder{color:#7888a2}.tools{display:flex;gap:7px;align-items:center}.iconbtn{width:43px;height:43px;padding:0;display:grid;place-items:center;font-size:17px}.send{width:48px;height:43px;border:0;border-radius:13px;background:linear-gradient(135deg,#6a83ff,#4aabd1);font-size:18px;font-weight:900}.hint{max-width:920px;margin:9px auto 0;text-align:center;color:#71809a;font-size:10px}
+dialog{border:1px solid var(--line);background:#111a2a;color:var(--text);border-radius:20px;width:min(440px,calc(100% - 30px));padding:23px;box-shadow:0 25px 100px #000b}dialog::backdrop{background:#030610bb;backdrop-filter:blur(5px)}dialog h3{margin:0 0 18px}.setting{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 0;border-bottom:1px solid var(--line)}.setting small{display:block;color:var(--muted);margin-top:4px}.setting input{width:19px;height:19px;accent-color:#6687ff}.close{margin-top:18px;width:100%}
+@media(max-width:850px){.shell{grid-template-columns:1fr;padding:9px}.sidebar{display:none}.main{min-height:calc(100vh - 18px)}.content{padding:15px}.composer-wrap{padding:0 12px 14px}.topbar{padding:14px}.msg{max-width:96%}}@media(max-width:500px){.top-sub{display:none}.top-actions .label{display:none}.entry{flex-wrap:wrap}.entry textarea{flex-basis:100%;order:-1}.tools{width:100%;justify-content:flex-end}.welcome{padding:25px 8px}}
+</style></head>
+<body><div class="shell">
+<aside class="sidebar"><div class="brand"><div class="logo">Z</div><div><h1>ZAGKAS AI</h1><small>INTELLIGENCE STUDIO</small></div></div>
+<button class="primary" id="newChat">＋ Νέα συνομιλία</button><div class="navlabel">WORKSPACE</div><button class="ghost" id="settingsSide">⚙ Ρυθμίσεις</button><div class="navlabel">SYSTEM STATUS</div><div class="online" id="connection"><span class="dot"></span> Έλεγχος σύνδεσης…</div>
+<div class="side-note">Ο προσωπικός σου AI συνεργάτης. Κείμενο, εικόνες και φωνή σε ένα ενιαίο περιβάλλον.</div></aside>
+<main class="main"><header class="topbar"><div><div class="top-title">Προσωπικός βοηθός</div><div class="top-sub" id="modelStatus">Fast cloud intelligence · μία τελική απάντηση</div></div><div class="top-actions"><button class="ghost" id="settingsTop">⚙ <span class="label">Ρυθμίσεις</span></button><button class="ghost" id="clear">Καθαρισμός</button><button class="ghost" id="install" hidden>⇩ Εγκατάσταση</button></div></header>
+<div class="content"><section id="chat"><div class="welcome" id="welcome"><div class="orb">✦</div><h2>Τι θα δημιουργήσουμε σήμερα;</h2><p>Ρώτησε, σχεδίασε, ανέλυσε εικόνες ή μίλησε με τον Ζάγκα. Είμαι έτοιμος.</p><div class="chips"><span class="chip">✧ Ανάλυση εικόνων</span><span class="chip">⌘ Προγραμματισμός</span><span class="chip">◉ Έρευνα & ιδέες</span></div></div></section></div>
+<div class="composer-wrap"><form class="composer" id="form"><div class="previews" id="previews"></div><div class="entry"><textarea id="input" rows="1" placeholder="Γράψε στον Ζάγκα… (Enter για αποστολή)"></textarea><div class="tools"><input id="files" type="file" accept="image/*" multiple hidden><button class="iconbtn" type="button" id="addImage" title="Προσθήκη εικόνων">＋</button><button class="iconbtn" type="button" id="mic" title="Φωνητική εισαγωγή">🎙</button><button class="send" type="submit" title="Αποστολή">↑</button></div></div></form><div class="hint">Ο Ζάγκας μπορεί να κάνει λάθη. Έλεγχε σημαντικές πληροφορίες.</div></div></main></div>
+<dialog id="settings"><h3>Ρυθμίσεις Ζάγκα</h3><label class="setting"><span>Ανάγνωση απαντήσεων<small>Διάβαζε δυνατά μόνο όταν είναι ενεργό.</small></span><input id="readAloud" type="checkbox"></label><label class="setting"><span>Ταχύτητα ομιλίας<small>Ρυθμός ανάγνωσης απαντήσεων.</small></span><select id="speechRate"><option value="0.9">Αργή</option><option value="1" selected>Κανονική</option><option value="1.15">Γρήγορη</option><option value="1.3">Πολύ γρήγορη</option></select></label><div class="setting"><span>Φωνητική εισαγωγή<small>Πάτησε το μικρόφωνο για να μιλήσεις.</small></span><span>🎙</span></div><div class="setting"><span>Wake word «Ζάγκα»<small>Απαιτεί εγκατεστημένη desktop εφαρμογή και συνεχή πρόσβαση μικροφώνου. Δεν ενεργοποιείται από αυτή την έκδοση browser.</small></span><span>Προσεχώς</span></div><button class="primary close" id="closeSettings" type="button">Έγινε</button></dialog>
 <script>
-const chat=document.getElementById("chat");
-const input=document.getElementById("input");
-const form=document.getElementById("form");
-const status=document.getElementById("status");
-const clear=document.getElementById("clear");
-const speak=document.getElementById("speak");
-const installButton=document.getElementById("install");
-let installPrompt=null;
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;installButton.hidden=false;});
-installButton.addEventListener("click",async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installButton.hidden=true;});
-window.addEventListener("appinstalled",()=>{installButton.hidden=true;status.textContent="Η εφαρμογή εγκαταστάθηκε!";});
-if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("/sw.js").catch(()=>{});
-let messages=JSON.parse(localStorage.getItem("alex_messages")||"[]");
-
-function render(){
-  chat.innerHTML="";
-  if(!messages.length){
-    chat.innerHTML='<div class="empty">Γράψε κάτι για να ξεκινήσεις.</div>';
-    return;
-  }
-  for(const m of messages){
-    const el=document.createElement("div");
-    el.className="msg "+(m.role==="user"?"user":"assistant");
-    el.textContent=m.content;
-    chat.appendChild(el);
-  }
-  chat.scrollTop=chat.scrollHeight;
-}
-function save(){localStorage.setItem("alex_messages",JSON.stringify(messages));}
-function speakText(text){
-  if(!("speechSynthesis" in window)){alert("Η φωνητική λειτουργία δεν υποστηρίζεται από τον browser.");return;}
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="el-GR"; u.rate=0.98; u.pitch=1;
-  const voices=speechSynthesis.getVoices();
-  const greek=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith("el"));
-  if(greek)u.voice=greek;
-  speechSynthesis.speak(u);
-}
-
-async function health(){
-  try{
-    const r=await fetch("/api/health");
-    const d=await r.json();
-    status.textContent=d.configured ? "● Συνδεδεμένο · Fast mode: "+d.model : "● Λείπει το GROQ_API_KEY";
-    status.style.color=d.configured?"#63d391":"#ffb454";
-  }catch{status.textContent="● Ο server δεν απαντά";}
-}
-form.addEventListener("submit",async e=>{
-  e.preventDefault();
-  const text=input.value.trim();
-  if(!text)return;
-  messages.push({role:"user",content:text});
-  input.value=""; save(); render();
-  const pending={role:"assistant",content:"Σκέφτομαι…"};
-  messages.push(pending); render();
-  try{
-    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(0,-1)})});
-    const d=await r.json();
-    if(!r.ok)throw new Error(d.error||"Request failed");
-    pending.content=d.output||"Δεν πήρα απάντηση.";
-    speakText(pending.content);
-  }catch(err){pending.content="Σφάλμα: "+err.message;}
-  save(); render();
-});
-clear.addEventListener("click",()=>{messages=[];save();render();speechSynthesis?.cancel();});
-speak.addEventListener("click",()=>{const last=[...messages].reverse().find(m=>m.role==="assistant");if(last)speakText(last.content);});
-input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit();}});
-render(); health();
-</script>
-</body>
-</html>
+const $=id=>document.getElementById(id),chat=$("chat"),input=$("input"),form=$("form"),files=$("files"),previews=$("previews");
+let messages=JSON.parse(localStorage.getItem("zagkas_messages")||"[]"),attachments=[],installPrompt=null;
+const readAloud=$("readAloud"),speechRate=$("speechRate");
+readAloud.checked=localStorage.getItem("zagkas_read_aloud")==="true";speechRate.value=localStorage.getItem("zagkas_speech_rate")||"1";
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;$("install").hidden=false});
+$("install").onclick=async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$("install").hidden=true}};
+if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+function save(){localStorage.setItem("zagkas_messages",JSON.stringify(messages.slice(-60)))}
+function speakText(text){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="el-GR";u.rate=Number(speechRate.value);const v=speechSynthesis.getVoices().find(x=>x.lang?.toLowerCase().startsWith("el"));if(v)u.voice=v;speechSynthesis.speak(u)}
+function render(){chat.innerHTML="";if(!messages.length){chat.innerHTML='<div class="welcome" id="welcome"><div class="orb">✦</div><h2>Τι θα δημιουργήσουμε σήμερα;</h2><p>Ρώτησε, σχεδίασε, ανέλυσε εικόνες ή μίλησε με τον Ζάγκα.</p><div class="chips"><span class="chip">✧ Ανάλυση εικόνων</span><span class="chip">⌘ Προγραμματισμός</span><span class="chip">◉ Έρευνα & ιδέες</span></div></div>';return}for(const m of messages){const el=document.createElement("article");el.className="msg "+m.role;const meta=document.createElement("div");meta.className="msgmeta";meta.textContent=m.role==="user"?"ΕΣΥ":"ZAGKAS AI";el.append(meta);const body=document.createElement("div");body.textContent=m.content;el.append(body);if(m.images?.length){for(const src of m.images){const im=document.createElement("img");im.src=src;im.alt="Εικόνα που επισυνάφθηκε";el.append(im)}}chat.append(el)}chat.scrollTop=chat.scrollHeight}
+function drawPreviews(){previews.innerHTML="";attachments.forEach((a,i)=>{const wrap=document.createElement("div");wrap.className="preview";const im=document.createElement("img");im.src=a.data;im.alt=a.name;const b=document.createElement("button");b.type="button";b.className="remove";b.textContent="×";b.onclick=()=>{attachments.splice(i,1);drawPreviews()};wrap.append(im,b);previews.append(wrap)})}
+$("addImage").onclick=()=>files.click();
+files.onchange=async()=>{const chosen=[...files.files].filter(f=>f.type.startsWith("image/"));for(const f of chosen){if(attachments.length>=12)break;if(f.size>6*1024*1024){alert("Η εικόνα "+f.name+" ξεπερνά τα 6 MB.");continue}const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f)});attachments.push({name:f.name,data})}files.value="";drawPreviews()};
+$("clear").onclick=$("newChat").onclick=()=>{messages=[];save();render();speechSynthesis?.cancel()};
+$("settingsTop").onclick=$("settingsSide").onclick=()=>$("settings").showModal();
+$("closeSettings").onclick=()=>$("settings").close();
+readAloud.onchange=()=>localStorage.setItem("zagkas_read_aloud",readAloud.checked);
+speechRate.onchange=()=>localStorage.setItem("zagkas_speech_rate",speechRate.value);
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+$("mic").onclick=()=>{if(!SpeechRecognition){alert("Η φωνητική εισαγωγή δεν υποστηρίζεται σε αυτόν τον browser. Δοκίμασε Chrome ή Edge.");return}const rec=new SpeechRecognition();rec.lang="el-GR";rec.interimResults=false;rec.onresult=e=>{input.value+=(input.value?" ":"")+e.results[0][0].transcript;input.focus()};rec.onerror=e=>alert("Πρόβλημα μικροφώνου: "+e.error);rec.start()};
+async function health(){try{const r=await fetch("/api/health");const d=await r.json();$("connection").innerHTML=d.configured?'<span class="dot"></span> Συνδεδεμένο · Groq Cloud':'● Λείπει API key';$("modelStatus").textContent=d.configured?"Fast AI · "+d.model+" · Vision: "+d.visionModel:"Ρύθμισε το GROQ_API_KEY"}catch{$("connection").textContent="Server εκτός σύνδεσης"}}
+form.onsubmit=async e=>{e.preventDefault();const text=input.value.trim();if(!text&&!attachments.length)return;const imgs=attachments.map(a=>a.data);messages.push({role:"user",content:text||"Ανάλυσε τις εικόνες που επισυνάπτω.",images:imgs});input.value="";attachments=[];drawPreviews();save();render();const pending={role:"assistant",content:"Ο Ζάγκας επεξεργάζεται το αίτημά σου…"};messages.push(pending);render();try{const apiMessages=messages.slice(0,-1).slice(-12).map(m=>{if(m.role==="user"&&m.images?.length)return{role:"user",content:[{type:"text",text:m.content},...m.images.map(url=>({type:"image_url",image_url:{url}}))]};return{role:m.role,content:m.content}});const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:apiMessages})});const d=await r.json();if(!r.ok)throw Error(d.error||"Request failed");pending.content=d.output||"Δεν πήρα απάντηση.";pending.model=d.model;if(readAloud.checked)speakText(pending.content)}catch(err){pending.content="Σφάλμα: "+err.message}save();render()};
+input.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}};
+render();health();
+</script></body></html>
