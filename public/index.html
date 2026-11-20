@@ -46,7 +46,24 @@ readAloud.onchange=()=>localStorage.setItem("zagkas_read_aloud",readAloud.checke
 speechRate.onchange=()=>localStorage.setItem("zagkas_speech_rate",speechRate.value);
 const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
 $("mic").onclick=()=>{if(!SpeechRecognition){alert("Η φωνητική εισαγωγή δεν υποστηρίζεται σε αυτόν τον browser. Δοκίμασε Chrome ή Edge.");return}const rec=new SpeechRecognition();rec.lang="el-GR";rec.interimResults=false;rec.onresult=e=>{input.value+=(input.value?" ":"")+e.results[0][0].transcript;input.focus()};rec.onerror=e=>alert("Πρόβλημα μικροφώνου: "+e.error);rec.start()};
-async function health(){try{const r=await fetch("/api/health");const d=await r.json();$("connection").innerHTML=d.configured?'<span class="dot"></span> Συνδεδεμένο · Groq Cloud':'● Λείπει API key';$("modelStatus").textContent=d.configured?"Fast AI · "+d.model+" · Vision: "+d.visionModel:"Ρύθμισε το GROQ_API_KEY"}catch{$("connection").textContent="Server εκτός σύνδεσης"}}
+async function health(){
+  try {
+    const r = await fetch("/api/health");
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+
+    $("connection").innerHTML = d.configured
+      ? '<span class="dot"></span> Συνδεδεμένο · xAI / Grok'
+      : '● Λείπει XAI_API_KEY';
+
+    $("modelStatus").textContent = d.configured
+      ? "Grok AI · " + d.model + " · Vision: " + d.visionModel
+      : "Ρύθμισε το XAI_API_KEY";
+  } catch (error) {
+    $("connection").textContent = "Server εκτός σύνδεσης";
+    $("modelStatus").textContent = "Δεν είναι δυνατή η επικοινωνία με τον server";
+  }
+}
 form.onsubmit=async e=>{e.preventDefault();const text=input.value.trim();if(!text&&!attachments.length)return;const imgs=attachments.map(a=>a.data);messages.push({role:"user",content:text||"Ανάλυσε τις εικόνες που επισυνάπτω.",images:imgs});input.value="";attachments=[];drawPreviews();save();render();const pending={role:"assistant",content:"Ο Ζάγκας επεξεργάζεται το αίτημά σου…"};messages.push(pending);render();try{const apiMessages=messages.slice(0,-1).slice(-12).map(m=>{if(m.role==="user"&&m.images?.length)return{role:"user",content:[{type:"text",text:m.content},...m.images.map(url=>({type:"image_url",image_url:{url}}))]};return{role:m.role,content:m.content}});const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:apiMessages})});const d=await r.json();if(!r.ok)throw Error(d.error||"Request failed");pending.content=d.output||"Δεν πήρα απάντηση.";pending.model=d.model;if(readAloud.checked)speakText(pending.content)}catch(err){pending.content="Σφάλμα: "+err.message}save();render()};
 input.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}};
 render();health();
